@@ -1,0 +1,17 @@
+name = "WORKER_NAME"
+main = "src/index.ts"
+compatibility_date = "2023-01-07"
+
+account_id = "ACCOUNT_ID"
+workers_dev = true
+
+[vars]
+DEPLOYMENT_KEY = "DEPLOYMENT_KEY"
+
+[triggers]
+crons = ["* * * * *"]
+
+[[kv_namespaces]]
+binding = "FLAGS_KV"
+preview_id = "FLAGS_KV_PREVIEW_ID"
+id = "FLAGS_KV_ID"
