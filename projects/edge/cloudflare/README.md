@@ -25,13 +25,13 @@ yarn install
 
 In `wrangler.toml`, replace:
 
-| Replace             | Description                                                     |
-|---------------------|-----------------------------------------------------------------|
-| WORKER_NAME         | The name of your Cloudflare Worker.                             |
-| ACCOUNT_ID          | Your cloudflare account ID.                                     |
-| DEPLOYMENT_KEY      | Your Amplitude Experiment deployment key (must be server type)  |
-| FLAGS_KV_PREVIEW_ID | The preview ID for the KV used to store flag configs.           |
-| FLAGS_KV_ID         | The ID for the KV used to store flag configs.                   |
+| Replace               | Description                                                     |
+|-----------------------|-----------------------------------------------------------------|
+| `WORKER_NAME`         | The name of your Cloudflare Worker.                             |
+| `ACCOUNT_ID`          | Your cloudflare account ID.                                     |
+| `DEPLOYMENT_KEY`      | Your Amplitude Experiment deployment key (must be server type)  |
+| `FLAGS_KV_PREVIEW_ID` | The preview ID for the KV used to store flag configs.           |
+| `FLAGS_KV_ID`         | The ID for the KV used to store flag configs.                   |
 
 ### Run the worker
 
