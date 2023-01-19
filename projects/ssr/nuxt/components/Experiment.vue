@@ -1,13 +1,16 @@
 <template>
-  <p>variants: {{ experiments }}</p>
+  <p>
+    variant: {{ experiment.variant('MY-FLAG-KEY') }}
+    <br />
+    all: {{ experiment.all() }}
+  </p>
 </template>
 
 <script>
   export default {
     data() {
-      console.log('data', this.$isServer, this.$experiments)
       return {
-        experiments: this.$experiments
+        experiment: this.$experiment
       }
     },
   }

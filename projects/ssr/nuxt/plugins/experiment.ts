@@ -1,10 +1,21 @@
 import { Context } from "@nuxt/types";
 import { Inject } from "@nuxt/types/app";
-import {Experiment, LocalEvaluationClient, RemoteEvaluationClient, Variant} from "@amplitude/experiment-node-server";
+import {
+  Experiment as ExperimentServer,
+  LocalEvaluationClient,
+  RemoteEvaluationClient,
+  Variant
+} from "@amplitude/experiment-node-server";
+import {Experiment, ExperimentClient, Exposure, Source} from "@amplitude/experiment-js-client";
 
+// TODO Customize key used to reference ID in cookie.
 const ID_COOKIE_KEY = 'ID_COOKIE_KEY'
-const DEPLOYMENT_KEY = 'DEPLOYMENT_KEY'
+
+// TODO Update server and client deployment key.
+const SERVER_DEPLOYMENT_KEY = 'SERVER_DEPLOYMENT_KEY'
+const CLIENT_DEPLOYMENT_KEY = 'CLIENT_DEPLOYMENT_KEY'
 const LOCAL_EVALUATION = true
+
 let experimentLocal: LocalEvaluationClient
 let experimentRemote: RemoteEvaluationClient
 
@@ -13,17 +24,19 @@ export default async function (context: Context, inject: Inject) {
   // Chose which evaluation mode to use. You may remove the other.
   if (process.server) {
     if (!experimentLocal && LOCAL_EVALUATION) {
-      experimentLocal = Experiment.initializeLocal(DEPLOYMENT_KEY, {debug: true})
+      experimentLocal = ExperimentServer.initializeLocal(SERVER_DEPLOYMENT_KEY, {debug: true})
       await experimentLocal.start()
     }
     if (!experimentRemote && !LOCAL_EVALUATION) {
-      experimentRemote = Experiment.initializeRemote(DEPLOYMENT_KEY, {debug: true})
+      experimentRemote = ExperimentServer.initializeRemote(SERVER_DEPLOYMENT_KEY, {debug: true})
     }
   }
 
-  let experiments: Record<string, Variant> = {}
+  let variants: Record<string, Variant> = {}
 
-  // Server-side
+  /*
+   * Server-side
+   */
   if (process.server) {
     // Parse device id from cookie, or generate if the cookie is not set.
     const { req, res, beforeNuxtRender } = context
@@ -32,11 +45,7 @@ export default async function (context: Context, inject: Inject) {
     if (cookie) {
       deviceId = cookie.split(';').find(value => {
         const pair: string[] = value.split('=')
-        if (pair && pair.length > 1 && pair[0].trim() === ID_COOKIE_KEY) {
-          return true
-        } else {
-          return false
-        }
+        return pair && pair.length > 1 && pair[0].trim() === ID_COOKIE_KEY;
       })
     }
     if (!deviceId) {
@@ -46,25 +55,41 @@ export default async function (context: Context, inject: Inject) {
     // Evaluate the user.
     const user = { device_id: deviceId }
     if (LOCAL_EVALUATION) {
-      experiments = await experimentLocal.evaluate(user)
+      variants = await experimentLocal.evaluate(user)
     } else {
-      experiments = await experimentRemote.fetch(user)
+      variants = await experimentRemote.fetch(user)
     }
-    // Set the result in the nuxt state.
+    // Set the result in the nuxt state to be used on the client side.
     beforeNuxtRender(({ nuxtState }) => {
-      nuxtState.experiments = experiments
+      nuxtState.variants = variants
     })
   }
 
-  // Client-side
+  /*
+   * Client-side
+   */
   if (process.client) {
-    // Access experiments from the nuxt state
+    // Access variants from the nuxt state
     const { nuxtState } = context
-    experiments = nuxtState.experiments
+    variants = nuxtState.variants
   }
 
-  // Inject the experiments to be used in components
-  inject('experiments', experiments)
+  // Initialize the experiment client and inject to be used in components.
+  const experiment = Experiment.initialize(CLIENT_DEPLOYMENT_KEY, {
+    initialVariants: variants,
+    source: Source.InitialVariants,
+    exposureTrackingProvider: {
+      track(exposure: Exposure)  {
+        // TODO Track exposure, but only on client-side.
+        if (process.client) {
+          console.log('Exposure:', exposure)
+        }
+      }
+    }
+  })
+  // Client side experiment SDK can be accessed from via this.$experiment
+  // See: ../components/Experiment.vue
+  inject('experiment', experiment)
 }
 
 const randomString = (length: number): string => {
