@@ -7,21 +7,36 @@
  *
  * Learn more at https://developers.cloudflare.com/workers/
  */
-import { evaluate } from "@amplitude/evaluation-js";
+
+import {
+  EvaluationEngine,
+  EvaluationFlag,
+  EvaluationVariant,
+  HttpRequest,
+  HttpResponse,
+  HttpClient,
+  SdkFlagApi,
+  topologicalSort
+} from "@amplitude/experiment-core";
 
 export interface Env {
   DEPLOYMENT_KEY: string;
   FLAGS_KV: KVNamespace;
 }
 
-type FlagConfig = Record<string, unknown>;
+// Implementation of the core HttpClient interface using cloudflare APIs.
+const httpClient: HttpClient = {
+  async request(request: HttpRequest): Promise<HttpResponse> {
+    const response = await fetch(request.requestUrl, {
+      headers: request.headers,
+    });
+    const body = await response.text();
+    return { status: response.status, body }
+  }
+}
 
-type Variant = {
-  value: string;
-  payload?: string;
-};
-
-type EvaluationResult = Record<string, Variant>;
+// The evaluation engine.
+const engine = new EvaluationEngine();
 
 export default {
   async fetch(
@@ -35,19 +50,25 @@ export default {
     const deviceId = url.searchParams.get("device_id");
     if (!userId && !deviceId) {
       return new Response(
-        `request must contain 'user_id' or 'device_id' query parameters`
+        `request must contain 'user_id' or 'device_id' query parameters asdf`
       );
     }
     try {
-      // Get flag configs from the KV.
-      const flags = await env.FLAGS_KV.get<FlagConfig[]>(env.DEPLOYMENT_KEY, {
+      // Get flag configs from the KV. Validate, and map to object of flag keys
+      // to flag config objects.
+      const flags = await env.FLAGS_KV.get<Record<string, EvaluationFlag>>(env.DEPLOYMENT_KEY, {
         type: "json",
       });
-      if (!flags || flags.length === 0) {
+      if (!flags || Object.keys(flags).length === 0) {
         return new Response("{}");
       }
+      // Build the user object
+      const user = { user_id: userId, device_id: deviceId };
       // Evaluate user for flag configs
-      const results: EvaluationResult = evaluate(flags, { user_id: userId });
+      const results: Record<string, EvaluationVariant> = engine.evaluate(
+          { user: user },
+          topologicalSort(flags)
+      );
       return new Response(JSON.stringify(results));
     } catch (e) {
       // Evaluation failed.
@@ -63,30 +84,25 @@ export default {
     env: Env,
     ctx: ExecutionContext
   ): Promise<void> {
-    // Fetch the flag configs from Amplitude
-    const response = await fetch(
-      "https://api.lab.amplitude.com/sdk/rules?eval_mode=local",
-      {
-        headers: {
-          Authorization: `Api-Key ${env.DEPLOYMENT_KEY}`,
-        },
-      }
+    const client = new SdkFlagApi(
+        env.DEPLOYMENT_KEY,
+        "https://flag.lab.amplitude.com",
+        httpClient
     );
-    if (response.status != 200) {
-      console.error(
-        "fetch flag configs - failed:",
-        response.status,
-        response.statusText
-      );
+    // Get the flag configurations.
+    let flags: Record<string, EvaluationFlag>;
+    try {
+      flags = await client.getFlags();
+    } catch (e) {
+      console.error("get flag configs - failure:", e);
       return;
     }
     // Write the flag configs to the KV. The KV key is the deployment key, and
     // the value is all the flags configs.
-    const flags: FlagConfig[] = await response.json();
     try {
       await env.FLAGS_KV.put(env.DEPLOYMENT_KEY, JSON.stringify(flags));
     } catch (e) {
-      console.log("put kv - error:", env.DEPLOYMENT_KEY);
+      console.error("put kv - failure:", env.DEPLOYMENT_KEY, e);
     }
   },
 };

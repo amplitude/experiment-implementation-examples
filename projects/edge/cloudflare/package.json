@@ -2,7 +2,7 @@
   "name": "evaluator",
   "version": "0.0.0",
   "dependencies": {
-    "@amplitude/evaluation-js": "1.0.0"
+    "@amplitude/experiment-core": "^0.7.1"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20221111.1",

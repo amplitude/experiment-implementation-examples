@@ -2,10 +2,12 @@
 # yarn lockfile v1
 
 
-"@amplitude/evaluation-js@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@amplitude/evaluation-js/-/evaluation-js-1.0.0.tgz#1ae828379d3600f433b37a505514b756c94678ef"
-  integrity sha512-U2ibGJ+5XLwfyHPmwDdxkqWhxxmZBs/gnPWalKBnmcY4zGXfBi2XkGbHsghlAD3XD3vZ1eMl7xqhHp3CWtpp/g==
+"@amplitude/experiment-core@^0.7.1":
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/@amplitude/experiment-core/-/experiment-core-0.7.1.tgz#a1917e15e617cbe626c01138881e99180f26bd35"
+  integrity sha512-RM0xX4TBVuS/cv2Tu4BG+1AhG7nOUFO6bmklrGoeASB/tdZ+hda28lF1YO+YI7A9b+5+pED8i/vuUrsVuHEkSg==
+  dependencies:
+    js-base64 "^3.7.5"
 
 "@cloudflare/kv-asset-handler@^0.2.0":
   version "0.2.0"
@@ -537,6 +539,11 @@ isexe@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/isexe/-/isexe-2.0.0.tgz#e8fbf374dc556ff8947a10dcb0572d633f2cfa10"
   integrity sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==
+
+js-base64@^3.7.5:
+  version "3.7.6"
+  resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-3.7.6.tgz#6ccb5d761b48381fd819f9ce04998866dbcbbc99"
+  integrity sha512-NPrWuHFxFUknr1KqJRDgUQPexQF0uIJWjeT+2KjEePhitQxQEx5EJBG1lVn5/hc8aLycTpXrDOgPQ6Zq+EDiTA==
 
 kleur@^4.1.4:
   version "4.1.5"
