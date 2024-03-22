@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amplitude Experiment - HTML Example</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <!-- Style -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .btn-blue {
+        @apply inline-flex items-center justify-center px-5 py-3 mr-4 text-base font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300;
+      }
+      .btn-pink {
+        @apply inline-flex items-center justify-center px-5 py-3 mr-4 text-base font-medium text-center text-white rounded-lg bg-pink-700 hover:bg-pink-800 focus:ring-4 focus:ring-pink-300;
+      }
+      .btn-light {
+        @apply inline-flex items-center justify-center px-5 py-3 mr-4 text-base font-medium text-center text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-gray-100;
+      }
+    }
+  </style>
+
+  <!-- Install the Amplitude Analytics SDK via script tag. -->
+  <script type="text/javascript">
+    !function(){"use strict";!function(e,t){var r=e.amplitude||{_q:[],_iq:{}};if(r.invoked)e.console&&console.error&&console.error("Amplitude snippet has been loaded.");else{var n=function(e,t){e.prototype[t]=function(){return this._q.push({name:t,args:Array.prototype.slice.call(arguments,0)}),this}},s=function(e,t,r){return function(n){e._q.push({name:t,args:Array.prototype.slice.call(r,0),resolve:n})}},o=function(e,t,r){e._q.push({name:t,args:Array.prototype.slice.call(r,0)})},i=function(e,t,r){e[t]=function(){if(r)return{promise:new Promise(s(e,t,Array.prototype.slice.call(arguments)))};o(e,t,Array.prototype.slice.call(arguments))}},a=function(e){for(var t=0;t<g.length;t++)i(e,g[t],!1);for(var r=0;r<m.length;r++)i(e,m[r],!0)};r.invoked=!0;var c=t.createElement("script");c.type="text/javascript",c.integrity="sha384-Ol58TfOsNybIM6XVa0NjYeYp+FrT0boas+HSl4vSP5115xZQ9gfsgOqqFlbtQh4U",c.crossOrigin="anonymous",c.async=!0,c.src="https://cdn.amplitude.com/libs/analytics-browser-2.3.8-min.js.gz",c.onload=function(){e.amplitude.runQueuedFunctions||console.log("[Amplitude] Error: could not load SDK")};var l=t.getElementsByTagName("script")[0];l.parentNode.insertBefore(c,l);for(var u=function(){return this._q=[],this},p=["add","append","clearAll","prepend","set","setOnce","unset","preInsert","postInsert","remove","getUserProperties"],d=0;d<p.length;d++)n(u,p[d]);r.Identify=u;for(var f=function(){return this._q=[],this},v=["getEventProperties","setProductId","setQuantity","setPrice","setRevenue","setRevenueType","setEventProperties"],y=0;y<v.length;y++)n(f,v[y]);r.Revenue=f;var g=["getDeviceId","setDeviceId","getSessionId","setSessionId","getUserId","setUserId","setOptOut","setTransport","reset","extendSession"],m=["init","add","remove","track","logEvent","identify","groupIdentify","setGroup","revenue","flush"];a(r),r.createInstance=function(e){return r._iq[e]={_q:[]},a(r._iq[e]),r._iq[e]},e.amplitude=r}}(window,document)}();
+    // TODO: Replace ANALYTICS_KEY with your own Amplitude API Key
+    amplitude.init('ANALYTICS_KEY');
+  </script>
+
+  <!-- Install the Amplitude Experiment SDK via script tag. -->
+  <script src="https://unpkg.com/@amplitude/experiment-js-client@1.10.0/dist/experiment.umd.js"></script>
+  <script>
+    // TODO: Replace DEPLOYMENT_KEY with your own deployment key.
+    // If you're using a 3rd party for analytics, configure an exposure
+    // tracking provider.
+    window.experiment = Experiment.Experiment.initializeWithAmplitudeAnalytics(
+            'DEPLOYMENT_KEY',
+            { debug: true } // Print debugging logs to the console. Disable for production
+    );
+  </script>
+
+
+</head>
+<!-- Hero Body -->
+<body>
+<section class="bg-white">
+  <div class="grid max-w-screen-xl px-4 py-8 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols-12">
+    <div class="mr-auto place-self-center lg:col-span-7">
+      <h1 class="max-w-2xl mb-4 text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl">
+        Unlock the power of your products
+      </h1>
+      <p class="max-w-2xl mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl">
+        Get data you can trust and insights you need to take action and drive growth.
+      </p>
+      <a href="https://app.amplitude.com/signup" class="btn-light">
+        Get started
+        <svg class="w-5 h-5 ml-2 -mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+      </a>
+      <a href="https://app.amplitude.com/analytics/demo" id="demo-button" style="visibility:hidden" class="btn-light">
+        Explore the demo
+      </a>
+    </div>
+    <div class="hidden lg:mt-0 lg:col-span-5 lg:flex">
+      <img src="hero_image.webp" alt="mockup">
+    </div>
+  </div>
+</section>
+</body>
+<!-- Feature flag logic -->
+<script>
+  /**
+   * Sets the state of the demo button based on the variant
+   * argument passed as input.
+   */
+  function setDemoButtonState(variant) {
+    const button = document.getElementById('demo-button');
+    if (variant.value) {
+      button.style.visibility = 'visible';
+      if (variant.payload) {
+        button.className = variant.payload['class'];
+      }
+    } else {
+      button.style.visibility = 'hidden';
+    }
+  }
+
+  if (window.experiment) {
+    // Get the initial variant from the experiment SDK using the flag key.
+    const flagKey = 'demo-button';
+    const variant = window.experiment.variant(flagKey);
+
+    // Set the initial state of the demo button based on the initial variant.
+    setDemoButtonState(variant);
+
+    // Start the experiment SDK
+    window.experiment.start().then(function () {
+      // Get the updated variant from the SDK and reset the button state.
+      const variant = window.experiment.variant(flagKey);
+      setDemoButtonState(variant);
+    });
+  }
+</script>
+</html>

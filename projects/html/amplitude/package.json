@@ -1,0 +1,12 @@
+{
+  "name": "getting-started-with-experiment",
+  "version": "1.0.0",
+  "description": "A simple example HTML application for getting started with Amplitude Experiment.",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server"
+  },
+  "keywords": ["html", "css"],
+  "author": "Brian Giori",
+  "license": "MIT"
+}
